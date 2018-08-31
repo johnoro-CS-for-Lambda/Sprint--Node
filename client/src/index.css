@@ -19,7 +19,30 @@ body {
   font-size: 1.5em;
 }
 
+.projects {
+  display: flex;
+  justify-content: space-around;
+}
+
+.projects .project {
+  border: 1px solid black;
+  padding: 0 20px 15px;
+}
+
 .project {
   border-bottom: 1px solid black;
   margin: 10px 0;
+}
+
+.action {
+  font-size: 90%;
+  border: 1px solid gray;
+  width: 50%;
+  margin: 10px auto;
+  padding: 5px;
+}
+
+.action h4 {
+  font-size: 105%;
+  margin-top: 10px;
 }
