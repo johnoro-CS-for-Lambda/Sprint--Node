@@ -10,7 +10,7 @@ body {
 
 .App-header {
   background-color: #222;
-  height: 100px;
+  height: 80px;
   padding: 20px;
   color: white;
 }
@@ -19,3 +19,7 @@ body {
   font-size: 1.5em;
 }
 
+.project {
+  border-bottom: 1px solid black;
+  margin: 10px 0;
+}
