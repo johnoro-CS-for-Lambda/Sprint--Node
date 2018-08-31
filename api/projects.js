@@ -14,7 +14,10 @@ router.get('/', getProjects);
 
 router.get('/:id', (req, res) => {
   db.get(req.params.id)
-    .then(project => res.status(200).json(project))
+    .then(project => {
+      if (!project) res.status(404).json({ error: 'That project doesn\'t exist.' });
+      else res.status(200).json(project);
+    })
     .catch(err => {
       console.error(err);
       res.status(500).json({ error: 'Server error getting project.' });
@@ -31,26 +34,43 @@ router.get('/:id/actions', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  db.insert(req.body)
-    .then(() => getProjects(req, res))
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: 'Server error adding the project.' });
-    });
+  const { name, description } = req.body;
+  if (!name || !description) {
+    res.status(404).json({ error: 'New projects need a name and description.' });
+  } else if (name.length > 128) {
+    res.status(404).json({ error: 'The provided name is too long (128 chars max).' })
+  } else {
+    db.insert(req.body)
+      .then(() => getProjects(req, res))
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: 'Server error adding the project.' });
+      });
+  }
 });
 
 router.put('/:id', (req, res) => {
-  db.update(req.params.id, req.body)
-    .then(() => getProjects(req, res))
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: 'Server error updating that project.' });
-    });
+  if (req.body.name && req.body.name.length > 128) {
+    res.status(404).json({ error: 'The provided name is too long (128 chars max).' })
+  } else {
+    db.update(req.params.id, req.body)
+      .then((newProj) => {
+        if (!newProj) res.status(404).json({ error: 'No project was found with the specified id.' });
+        else getProjects(req, res);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: 'Server error updating that project.' });
+      });
+  }
 });
 
 router.delete('/:id', (req, res) => {
   db.remove(req.params.id)
-    .then(() => getProjects(req, res))
+    .then((success) => {
+      if (!success) res.status(404).json({ error: 'No project was found with the specified id.' });
+      else getProjects(req, res);
+    })
     .catch(err => {
       console.error(err);
       res.status(500).json({ error: 'Server error deleting that project.' });
